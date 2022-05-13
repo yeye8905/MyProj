@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns= "http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.2.xsd">
+<beans:bean id="custompasswordEncoder" class="kr.or.ye.security.CustompasswordEncoder"/>
+<beans:bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+<beans:bean id ="customAuthenticationSuccessHandler" class="kr.or.ye.security.CustomAuthenticationSuccessHandler"/>
+<beans:bean id="customAccessDeniedHandler" class="kr.or.ye.security.CustomAccessDeniedHandler"/>
+<beans:bean id ="customUserDetailsService" class="kr.or.ye.security.CustomUserDetailsService"/>
+
+<!-- 웹보안 설정 -->
+<http>
+	<intercept-url pattern="/kye/all" access="permitAll"/>
+	<intercept-url pattern="/kye/admin" access="hasRole('ROLE_ADMIN')" />
+	<intercept-url pattern="/kye/member" access="hasRole('ROLE_MEMBER')"/>
+	
+	<intercept-url pattern="/**" access="permitAll"/>
+	
+	<form-login login-page="/yelogin" authentication-success-handler-ref="customAuthenticationSuccessHandler"/>
+	<logout logout-url="/yelogout" />
+	<access-denied-handler ref="customAccessDeniedHandler"/>
+	<csrf disabled="true"/>
+</http>
+
+<!-- 인증관리자설정 -->
+<authentication-manager erase-credentials="false">
+	<authentication-provider user-service-ref="customUserDetailsService">
+		<password-encoder ref="bcryptPasswordEncoder"/>
+	</authentication-provider>
+</authentication-manager>
+
+
+
+</beans:beans>
